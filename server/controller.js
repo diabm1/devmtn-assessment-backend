@@ -8,6 +8,17 @@ module.exports = {
         let randomCompliment = compliments[randomIndex];
       
         res.status(200).send(randomCompliment);
+    },
+
+    getFortune: (req, res) => {
+        const fortune = ["Your loyalty is a virtue, but not when it\’s wedded with blind stubbornness.","Your mentality is alert, practical, and analytical.","Your mind is creative, original and alert.", "Your mind is your greatest asset.", "Your moods signal a period of change.", "Your quick wits will get you out of a tough situation."]
+            
+        let randomIndex = Math.floor(Math.random() * fortune.length);
+        let randomFortune = fortune[randomIndex];
+      
+        res.status(200).send(randomFortune);         
+            
+            
     }
 
 }
