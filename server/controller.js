@@ -31,19 +31,29 @@ module.exports = {
     res.status(200).send(randomFortune);
   },
 
-  // postGratitude: (req, res) => {
-  //   const entryData = req.body;
-  //   entryData.date = new Date().toLocaleString();
-  //   gratitudeEntries.push(entryData);
-  //   console.log(gratitudeEntries)
-  //   res.status(200).send("Gratitude Entry Added Successfully");
+  // deleteItem: (req, res) => {
+  //   const index = req.params.id - 1; // Subtract 1 to get the array index
+  //   if (index < 0 || index >= fortune.length) {
+  //     return res.status(404).send("Fortune not found");
+  //   }
+
+  //   fortune.splice(index, 1);
+  //   res.status(200).send("Fortune deleted successfully");
   // },
 
-  // getGratitudeEntriesByDate: (req, res) => {
-  //   const date = req.params.date;
-  //   const entries = gratitudeEntries.filter((entry) => {
-  //     entry.date === date;
-  //   });
-  //   res.status(200).send(entries);
-  // },
+  postGratitude: (req, res) => {
+    const entryData = req.body;
+    entryData.date = new Date().toLocaleString();
+    gratitudeEntries.push(entryData);
+    console.log(gratitudeEntries)
+    res.status(200).send("Gratitude Entry Added Successfully");
+  },
+
+  getGratitudeEntriesByDate: (req, res) => {
+    const date = req.params.date;
+    const entries = gratitudeEntries.filter((entry) => {
+      entry.date === date;
+    });
+    res.status(200).send(entries);
+  },
 };
