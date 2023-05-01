@@ -30,19 +30,20 @@ module.exports = {
 
     res.status(200).send(randomFortune);
   },
-  
+
   postGratitude: (req, res) => {
     const entryData = req.body;
-    gratitudeEntries.push(entryData)
-    res.status(200).send("Gratitude entry added successfully");
+    entryData.date = new Date().toLocaleString();
+    gratitudeEntries.push(entryData);
+    console.log(gratitudeEntries)
+    res.status(200).send("Gratitude Entry Added Successfully");
   },
 
   getGratitudeEntriesByDate: (req, res) => {
     const date = req.params.date;
     const entries = gratitudeEntries.filter((entry) => {
-        entry.date === date
-    })
+      entry.date === date;
+    });
     res.status(200).send(entries);
   },
-
 };
