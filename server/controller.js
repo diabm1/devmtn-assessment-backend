@@ -31,29 +31,50 @@ module.exports = {
     res.status(200).send(randomFortune);
   },
 
-  // deleteItem: (req, res) => {
-  //   const index = req.params.id - 1; // Subtract 1 to get the array index
-  //   if (index < 0 || index >= fortune.length) {
-  //     return res.status(404).send("Fortune not found");
-  //   }
-
-  //   fortune.splice(index, 1);
-  //   res.status(200).send("Fortune deleted successfully");
-  // },
-
   postGratitude: (req, res) => {
     const entryData = req.body;
     entryData.date = new Date().toLocaleString();
     gratitudeEntries.push(entryData);
-    console.log(gratitudeEntries)
-    res.status(200).send("Gratitude Entry Added Successfully");
+    res.status(200).send(entryData); // Send back the newly created entry
+  },
+  
+
+  getGratitudeEntries: (req, res) => {
+    res.status(200).send(gratitudeEntries);
+  },
+
+  putGratitudeEntry: (req, res) => {
+    const id = req.params.id;
+    const updatedEntry = req.body;
+    gratitudeEntries = gratitudeEntries.map((entry) => {
+      if (entry.id === id) {
+        return {
+          ...entry,
+          ...updatedEntry,
+        };
+      }
+      return entry;
+    });
+    res.status(200).send(updatedEntry);
+  },
+
+  deleteGratitudeEntry: (req, res) => {
+    const id = req.params.id;
+    gratitudeEntries = gratitudeEntries.filter((entry) => entry.id !== id);
+    res.status(200).send({ message: "Entry deleted successfully" });
   },
 
   getGratitudeEntriesByDate: (req, res) => {
-    const date = req.params.date;
-    const entries = gratitudeEntries.filter((entry) => {
-      entry.date === date;
-    });
-    res.status(200).send(entries);
-  },
+    const date = req.query.date;
+    const filteredEntries = gratitudeEntries.filter((entry) => {
+        const entryDate = new Date(entry.date)
+        const queryDate = new Date(date)
+        return(
+            entryDate.getDate() === queryDate.getDate() &&
+            entryDate.getMonth() === queryDate.getMonth() &&
+            entryDate.getFullYear() === queryDate.getFullYear() 
+        )
+    })
+    res.status(200).send(filteredEntries)
+  }
 };

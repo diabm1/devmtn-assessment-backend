@@ -1,125 +1,114 @@
+const form = document.querySelector("form");
+const gratitudeInput = document.getElementById("gratitude");
+const entriesList = document.getElementById("journal-entries");
+const dateSelect = document.getElementById("date-select");
 const complimentBtn = document.getElementById("complimentButton");
 const fortuneBtn = document.getElementById("fortuneButton");
-const submitGratitudeBtn = document.getElementById("submit-gratitude-btn");
+
+let entries = [];
 
 const getCompliment = () => {
-  axios.get("http://localhost:4000/api/compliment/").then((res) => {
+  axios.get("http://localhost:4004/api/compliment/").then((res) => {
     const data = res.data;
     alert(data);
   });
 };
 
-// const deleteItem = (item, id) => {
-//   axios
-//     .delete(`http://localhost:4000/api/fortune/${id}`)
-//     .then(() => {
-//       const list = item.parentNode;
-//       list.removeChild(item);
-
-//       // Create a delete button/link for each list item
-//       const deleteBtn = document.createElement("button");
-//       deleteBtn.textContent = "Delete";
-//       listItem.appendChild(deleteBtn);
-
-//       // Attach a click event listener to the delete button/link
-//       deleteBtn.addEventListener("click", () => {
-//         // Call the deleteItem() function to delete the current list item
-//         deleteItem(listItem, data.id);
-//       });
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
-
 const getFortune = () => {
-  axios.get("http://localhost:4000/api/fortune/").then((res) => {
+  axios.get("http://localhost:4004/api/fortune/").then((res) => {
     const data = res.data;
-    // alert(data);
-    const list = document.getElementById("fortune-list");
-    const listItem = document.createElement("li");
-    list.appendChild(listItem);
-    const dataElement = document.createElement("span");
-    dataElement.textContent = data;
-    listItem.appendChild(dataElement);
-
-    // list.appendChild(entry);
+    alert(data);
   });
 };
 
-const handleSubmit = (event) => {
-  event.preventDefault();
-  const gratitudeInput = document.getElementById("gratitude");
-  const gratitude = gratitudeInput.value;
-  gratitudeInput.value = "";
+const renderEntries = () => {
+  console.log("Rendering entries: ", entries);
+    entriesList.innerHTML = "";
+    entries.forEach((entry) => {
+      const li = document.createElement("li");
+      if (entry.date) {
+        const date = new Date(entry.date).toLocaleDateString(); // Convert the date to a readable format
+        li.textContent = `${date}: ${entry.gratitude}`; // Display both the date and the gratitude text
+      } else {
+        li.textContent = entry.gratitude;
+      }
+      entriesList.appendChild(li);
+    });
+  };
+  
+
+const getGratitudeEntries = () => {
   axios
-    .post("http://localhost:4000/api/gratitude", {
-      gratitude,
-      date: new Date().toLocaleString(), // send the current date with the entry
-    })
+    .get("http://localhost:4004/api/gratitude")
     .then((res) => {
-      console.log(res.data);
+      entries = res.data;
+      renderEntries();
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-const getGratitudeEntriesByDate = () => {
-  const dateSelect = document.getElementById("date-select");
-  const selectedDate = dateSelect.value;
-  if (!selectedDate) {
-    return;
-  }
-  axios
-    .get(`http://localhost:4000/api/gratitude/${selectedDate}`)
-    .then((res) => {
-      const data = res.data;
-      const list = document.getElementById("journal-entries");
-      list.innerHTML = "";
-      data.forEach((entry) => {
-        const item = document.createElement("li");
-        item.textContent = `${entry.date}: ${entry.entryData.gratitude}`;
-        list.appendChild(item);
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
-const postGratitudeEntry = (e) => {
+const postGratitude = (e) => {
   e.preventDefault();
-
-  const gratitudeInput = document.getElementById("gratitude");
-  const gratitude = gratitudeInput.value;
-  const entryData = { gratitude: gratitude };
-
-  const dateSelect = document.getElementById("date-select");
-  const gratitudeDate = new Date().toLocaleString().slice(0, 8)
-  if (!dateSelect.options[dateSelect.options.length - 1].value) {
-      dateSelect.options[dateSelect.options.length - 1].remove();
-    }
-  const newOption = document.createElement("option");
-  newOption.value = gratitudeDate;
-  newOption.text = gratitudeDate;
-  dateSelect.add(newOption);
-  dateSelect.value = gratitudeDate;
-
+  const newEntry = {
+    gratitude: gratitudeInput.value,
+  };
+  console.log("Submitting gratitude entry: ", newEntry);
   axios
-    .post("http://localhost:4000/api/gratitude", {
-      entryData,
-      date: gratitudeDate,
-    })
+    .post("http://localhost:4004/api/gratitude", newEntry)
     .then((res) => {
-      console.log(res.data);
-      console.log("Gratitude Entry Successfully Submitted (frontend)");
+      console.log("Server response: ", res);
+      entries.push(res.data);
+      gratitudeInput.value = "";
+      renderEntries();
     })
     .catch((err) => {
       console.log(err);
     });
 };
+const putGratitudeEntry = (id, updatedEntry) => {
+  axios
+    .put(`http://localhost:4004/api/gratitude/${id}`, updatedEntry)
+    .then((res) => {
+      console.log("updating entry");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+const deleteGratitudeEntry = (id) => {
+  axios
+    .delete(`http://localhost:4004/api/gratitude/${id}`)
+    .then((res) => {
+      console.log("deleting entry");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+const getGratitudeEntriesByDate = () => {
 
+  const date = dateSelect.value;
+  if (date) {
+    axios
+      .get(`http://localhost:4004/api/gratitude?date=${date}`)
+      .then((res) => {
+        entries = res.data;
+        renderEntries();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    getGratitudeEntries();
+  }
+};
+
+form.addEventListener("submit", postGratitude);
+dateSelect.addEventListener("change", getGratitudeEntriesByDate);
 complimentBtn.addEventListener("click", getCompliment);
 fortuneBtn.addEventListener("click", getFortune);
-submitGratitudeBtn.addEventListener("click", postGratitudeEntry);
+// submitGratitudeBtn.addEventListener("click", postGratitudeEntry);
+
+// getEntries();
