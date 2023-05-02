@@ -1,0 +1,2 @@
+- controller.js: handles server logic
+- main.js: handles front-end logic

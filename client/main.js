@@ -49,14 +49,19 @@ const renderEntries = () => {
 };
 
 const editGratitudeEntry = (id) => {
-  const updateGratitude = prompt("Update your gratitude entry:");
+  const entryToUpdate = entries.find((entry) => entry.id === id);
+  const updateGratitude = prompt(
+    "Update your gratitude entry:",
+    entryToUpdate.gratitude
+  );
   let updatedEntry;
   if (updateGratitude) {
     updatedEntry = {
+      ...entryToUpdate,
       gratitude: updateGratitude,
     };
+    putGratitudeEntry(id, updatedEntry);
   }
-  putGratitudeEntry(id, updatedEntry);
 };
 
 const getGratitudeEntries = () => {
@@ -102,7 +107,7 @@ const postGratitude = (e) => {
   }
 
   const newEntry = {
-    id: id++,
+    id: new Date().getTime(),
     gratitude: gratitudeInput.value,
     date: new Date().toISOString(), // Add the current date to the new entry
   };
@@ -135,15 +140,18 @@ const putGratitudeEntry = (id, updatedEntry) => {
 };
 
 const deleteGratitudeEntry = (id) => {
-  axios
-    .delete(`http://localhost:4004/api/gratitude/${id}`)
-    .then((res) => {
-      console.log("deleting entry");
-      getGratitudeEntries();
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const confirmed = confirm("Are you sure you want to delete this entry?");
+  if (confirmed) {
+    axios
+      .delete(`http://localhost:4004/api/gratitude/${id}`)
+      .then((res) => {
+        console.log("deleting entry");
+        getGratitudeEntries();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 };
 
 const getGratitudeEntriesByDate = () => {

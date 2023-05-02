@@ -53,7 +53,7 @@ module.exports = {
   },
 
   putGratitudeEntry: (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const updatedEntry = req.body;
     gratitudeEntries = gratitudeEntries.map((entry) => {
       if (entry.id === id) {
@@ -68,7 +68,7 @@ module.exports = {
   },
 
   deleteGratitudeEntry: (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     gratitudeEntries = gratitudeEntries.filter((entry) => entry.id !== id);
     res.status(200).send({ message: "Entry deleted successfully" });
   },
