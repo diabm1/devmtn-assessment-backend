@@ -23,19 +23,37 @@ const getFortune = () => {
 
 const renderEntries = () => {
   console.log("Rendering entries: ", entries);
-    entriesList.innerHTML = "";
-    entries.forEach((entry) => {
-      const li = document.createElement("li");
-      if (entry.date) {
-        const date = new Date(entry.date).toLocaleDateString(); // Convert the date to a readable format
-        li.textContent = `${date}: ${entry.gratitude}`; // Display both the date and the gratitude text
-      } else {
-        li.textContent = entry.gratitude;
-      }
-      entriesList.appendChild(li);
-    });
-  };
-  
+  entriesList.innerHTML = "";
+  entries.forEach((entry) => {
+    const li = document.createElement("li");
+    const editBtn = document.createElement("button");
+    const deleteBtn = document.createElement("button")
+    deleteBtn.textContent = "Delete"
+    deleteBtn.addEventListener("click", () => deleteGratitudeEntry(entry.id))
+    li.appendChild(deleteBtn)
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", () => editGratitudeEntry(entry.id));
+    li.appendChild(editBtn);
+    if (entry.date) {
+      const date = new Date(entry.date).toLocaleDateString(); // Convert the date to a readable format
+      li.textContent = `${date}: ${entry.gratitude}`; // Display both the date and the gratitude text
+    } else {
+      li.textContent = entry.gratitude;
+    }
+    entriesList.appendChild(li);
+  });
+};
+
+const editGratitudeEntry = (id) => {
+  const updateGratitude = prompt("Update your gratitude entry:")
+  if(updateGratitude){
+    const updatedEntry = {
+      gratitude: updateGratitude,
+    }
+  }
+  putGratitudeEntry(id, updatedEntry)
+  getGratitudeEntries()
+}
 
 const getGratitudeEntries = () => {
   axios
@@ -43,15 +61,35 @@ const getGratitudeEntries = () => {
     .then((res) => {
       entries = res.data;
       renderEntries();
+      populateDateSelect();
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
+const populateDateSelect = () => {
+  const uniqueDates = new Set();
+  entries.forEach((entry) => {
+    const entryDate = new Date(entry.date).toLocaleDateString();
+    uniqueDates.add(entryDate);
+  });
+  
+  dateSelect.innerHTML = '<option value="">Select a date</option>';
+  uniqueDates.forEach((date) => {
+    const option = document.createElement("option");
+    option.value = date;
+    option.textContent = date;
+    dateSelect.appendChild(option);
+  });
+};
+
+let id = 1;
+
 const postGratitude = (e) => {
   e.preventDefault();
   const newEntry = {
+    id: id++,
     gratitude: gratitudeInput.value,
   };
   console.log("Submitting gratitude entry: ", newEntry);
@@ -88,7 +126,6 @@ const deleteGratitudeEntry = (id) => {
     });
 };
 const getGratitudeEntriesByDate = () => {
-
   const date = dateSelect.value;
   if (date) {
     axios
