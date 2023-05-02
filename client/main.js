@@ -35,7 +35,7 @@ const renderEntries = () => {
     editBtn.addEventListener("click", () => editGratitudeEntry(entry.id));
     li.appendChild(editBtn);
 
-    const entryTextSpan = document.createElement("span") // Create a span element for entry text
+    const entryTextSpan = document.createElement("span"); // Create a span element for entry text
 
     if (entry.date) {
       const date = new Date(entry.date).toLocaleDateString(); // Convert the date to a readable format
@@ -50,13 +50,13 @@ const renderEntries = () => {
 
 const editGratitudeEntry = (id) => {
   const updateGratitude = prompt("Update your gratitude entry:");
+  let updatedEntry;
   if (updateGratitude) {
-    const updatedEntry = {
+    updatedEntry = {
       gratitude: updateGratitude,
     };
   }
   putGratitudeEntry(id, updatedEntry);
-  getGratitudeEntries();
 };
 
 const getGratitudeEntries = () => {
@@ -74,6 +74,9 @@ const getGratitudeEntries = () => {
 
 const populateDateSelect = () => {
   const uniqueDates = new Set();
+  // Add today's date to the uniqueDates set
+  const today = new Date().toLocaleDateString();
+  uniqueDates.add(today);
   entries.forEach((entry) => {
     const entryDate = new Date(entry.date).toLocaleDateString();
     uniqueDates.add(entryDate);
@@ -101,8 +104,11 @@ const postGratitude = (e) => {
   const newEntry = {
     id: id++,
     gratitude: gratitudeInput.value,
+    date: new Date().toISOString(), // Add the current date to the new entry
   };
+
   console.log("Submitting gratitude entry: ", newEntry);
+
   axios
     .post("http://localhost:4004/api/gratitude", newEntry)
     .then((res) => {
@@ -115,6 +121,7 @@ const postGratitude = (e) => {
       console.log(err);
     });
 };
+
 const putGratitudeEntry = (id, updatedEntry) => {
   axios
     .put(`http://localhost:4004/api/gratitude/${id}`, updatedEntry)
@@ -126,6 +133,7 @@ const putGratitudeEntry = (id, updatedEntry) => {
       console.log(err);
     });
 };
+
 const deleteGratitudeEntry = (id) => {
   axios
     .delete(`http://localhost:4004/api/gratitude/${id}`)
@@ -137,6 +145,7 @@ const deleteGratitudeEntry = (id) => {
       console.log(err);
     });
 };
+
 const getGratitudeEntriesByDate = () => {
   const date = dateSelect.value;
   if (date) {
@@ -150,7 +159,8 @@ const getGratitudeEntriesByDate = () => {
         console.log(err);
       });
   } else {
-    getGratitudeEntries();
+    entries = []; // Clear the entries array
+    renderEntries(); // Call renderEntries to clear the displayed entries
   }
 };
 

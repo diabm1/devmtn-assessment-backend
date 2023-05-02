@@ -37,10 +37,19 @@ module.exports = {
     gratitudeEntries.push(entryData);
     res.status(200).send(entryData); // Send back the newly created entry
   },
-  
 
   getGratitudeEntries: (req, res) => {
-    res.status(200).send(gratitudeEntries);
+    const { date } = req.query;
+
+    if (date) {
+      const filteredEntries = gratitudeEntries.filter((entry) => {
+        const entryDate = new Date(entry.date).toLocaleDateString();
+        return entryDate === date;
+      });
+      res.status(200).send(filteredEntries);
+    } else {
+      res.status(200).send(gratitudeEntries);
+    }
   },
 
   putGratitudeEntry: (req, res) => {
@@ -67,14 +76,14 @@ module.exports = {
   getGratitudeEntriesByDate: (req, res) => {
     const date = req.query.date;
     const filteredEntries = gratitudeEntries.filter((entry) => {
-        const entryDate = new Date(entry.date)
-        const queryDate = new Date(date)
-        return(
-            entryDate.getDate() === queryDate.getDate() &&
-            entryDate.getMonth() === queryDate.getMonth() &&
-            entryDate.getFullYear() === queryDate.getFullYear() 
-        )
-    })
-    res.status(200).send(filteredEntries)
-  }
+      const entryDate = new Date(entry.date);
+      const queryDate = new Date(date);
+      return (
+        entryDate.getDate() === queryDate.getDate() &&
+        entryDate.getMonth() === queryDate.getMonth() &&
+        entryDate.getFullYear() === queryDate.getFullYear()
+      );
+    });
+    res.status(200).send(filteredEntries);
+  },
 };
