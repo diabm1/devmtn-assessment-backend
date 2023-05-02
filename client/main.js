@@ -7,6 +7,7 @@ const fortuneBtn = document.getElementById("fortuneButton");
 
 let entries = [];
 
+// Get random compliment from server
 const getCompliment = () => {
   axios.get("http://localhost:4004/api/compliment/").then((res) => {
     const data = res.data;
@@ -14,6 +15,7 @@ const getCompliment = () => {
   });
 };
 
+// Get random fortune from server
 const getFortune = () => {
   axios.get("http://localhost:4004/api/fortune/").then((res) => {
     const data = res.data;
@@ -21,6 +23,7 @@ const getFortune = () => {
   });
 };
 
+// Renders gratitude entries on page
 const renderEntries = () => {
   console.log("Rendering entries: ", entries);
   entriesList.innerHTML = "";
@@ -48,6 +51,7 @@ const renderEntries = () => {
   });
 };
 
+// Edit a gratitude entry and update it on server
 const editGratitudeEntry = (id) => {
   const entryToUpdate = entries.find((entry) => entry.id === id);
   const updateGratitude = prompt(
@@ -64,6 +68,7 @@ const editGratitudeEntry = (id) => {
   }
 };
 
+// Gets all gratitude entries from server
 const getGratitudeEntries = () => {
   axios
     .get("http://localhost:4004/api/gratitude")
@@ -77,9 +82,10 @@ const getGratitudeEntries = () => {
     });
 };
 
+// Populates the date selection dropdown with unique dates
 const populateDateSelect = () => {
   const uniqueDates = new Set();
-  // Add today's date to the uniqueDates set
+  // Adds today's date to the uniqueDates set
   const today = new Date().toLocaleDateString();
   uniqueDates.add(today);
   entries.forEach((entry) => {
@@ -98,6 +104,7 @@ const populateDateSelect = () => {
 
 let id = 1;
 
+// Adds a new gratitude entry and send it to the server
 const postGratitude = (e) => {
   e.preventDefault();
   const gratitudeText = gratitudeInput.value.trim();
@@ -127,6 +134,7 @@ const postGratitude = (e) => {
     });
 };
 
+// Updates an existing gratitude entry on the server
 const putGratitudeEntry = (id, updatedEntry) => {
   axios
     .put(`http://localhost:4004/api/gratitude/${id}`, updatedEntry)
@@ -139,6 +147,7 @@ const putGratitudeEntry = (id, updatedEntry) => {
     });
 };
 
+// Deletes a gratitude entry from the server
 const deleteGratitudeEntry = (id) => {
   const confirmed = confirm("Are you sure you want to delete this entry?");
   if (confirmed) {
@@ -154,6 +163,7 @@ const deleteGratitudeEntry = (id) => {
   }
 };
 
+// Gets a gratitude entry by a specific date
 const getGratitudeEntriesByDate = () => {
   const date = dateSelect.value;
   if (date) {
@@ -172,10 +182,12 @@ const getGratitudeEntriesByDate = () => {
   }
 };
 
+// Event listeners
 form.addEventListener("submit", postGratitude);
 dateSelect.addEventListener("change", getGratitudeEntriesByDate);
 complimentBtn.addEventListener("click", getCompliment);
 fortuneBtn.addEventListener("click", getFortune);
 // submitGratitudeBtn.addEventListener("click", postGratitudeEntry);
 
+// Gets and renders gratitude entries 
 getGratitudeEntries();
