@@ -3,5 +3,5 @@
 ## future - development
 
 [x] clear input text after user clicks submit
-[ ] append value from input into under journal entries header based on the date selected
+[x] append value from input into under journal entries header based on the date selected
 [x] keep default value select date
